@@ -124,7 +124,7 @@ if __name__ == "__main__":
             rank=Rank.OFFICER,
             age=18,
             specialization="Engineering",
-            years_experience=2,
+            years_experience=6,
         )
         crew_team: list[CrewMember] = []
         crew_team.append(crew1)

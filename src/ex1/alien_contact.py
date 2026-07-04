@@ -2,10 +2,10 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ValidationError
 
 
-class StartError(Exception):
+class StartError(ValueError):
     def __init__(self, message: str) -> None:
         self.message = message
         super().__init__(self, message)
@@ -14,7 +14,7 @@ class StartError(Exception):
         return f"{self.message}"
 
 
-class Verified(Exception):
+class Verified(ValueError):
     def __init__(self, message: str) -> None:
         self.message = message
         super().__init__(self, message)
@@ -23,7 +23,7 @@ class Verified(Exception):
         return f"{self.message}"
 
 
-class WitnessCount(Exception):
+class WitnessCount(ValueError):
     def __init__(self, message: str) -> None:
         self.message = message
         super().__init__(self, message)
@@ -32,7 +32,7 @@ class WitnessCount(Exception):
         return f"{self.message}"
 
 
-class MessageError(Exception):
+class MessageError(ValueError):
     def __init__(self, message: str) -> None:
         self.message = message
         super().__init__(self, message)
@@ -50,14 +50,14 @@ class ContactType(Enum):
 
 class alien_contact(BaseModel):
     contact_id: str = Field(..., min_length=5, max_length=15)
-    timestamp: datetime
+    timestamp: datetime = Field(...)
     location: str = Field(..., min_length=3, max_length=100)
-    contact_type: ContactType
+    contact_type: ContactType = Field(...)
     signal_strength: float = Field(..., ge=0.0, le=10.0)
     duration_minutes: int = Field(..., ge=1, le=1440)
     witness_count: int = Field(..., ge=1, le=100)
     message_received: Optional[str] = Field(default=None, max_length=500)
-    is_verified: bool = False
+    is_verified: bool = Field(default=False)
 
     @model_validator(mode="after")
     def test(self) -> "alien_contact":
@@ -65,10 +65,13 @@ class alien_contact(BaseModel):
             # equal to print(start_with_error object) -> override on __str__
             raise StartError("Contact ID must start with 'AC' (Alien Contact)")
 
-        if self.is_verified is False:
+        if (
+                self.contact_type == ContactType.PHYSICAL and
+                self.is_verified is False):
             raise Verified("Physical contact reports must be verified")
 
-        if self.witness_count < 3:
+        if (self.contact_type == ContactType.TELEPATHIC
+                and self.witness_count < 3):
             raise WitnessCount(
                 "Telepathic contact requires at least 3 witnesses"
             )
@@ -104,7 +107,7 @@ if __name__ == "__main__":
         print(f"Signal: {report.signal_strength}")
         print(f"Duration: {report.duration_minutes}")
         print(f"Message: {report.message_received}")
-    except Exception as e:
+    except ValidationError as e:
         print(f"Expected validation error:\n{e}")
 
     print("\n==============================================")
@@ -127,6 +130,6 @@ if __name__ == "__main__":
         print(f"Signal: {report.signal_strength}")
         print(f"Duration: {report.duration_minutes}")
         print(f"Message: {report.message_received}")
-    except Exception as e:
+    except ValidationError as e:
         print(f"Expected validation error:\n{e}")
 # print(report.model_dump())

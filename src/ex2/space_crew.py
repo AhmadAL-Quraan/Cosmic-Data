@@ -1,9 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, ValidationError, model_validator
 
 
-class MissionIdError(Exception):
+class MissionIdError(ValueError):
     def __init__(self, message: str) -> None:
         self.message = message
 
@@ -11,7 +11,7 @@ class MissionIdError(Exception):
         return f"{self.message}"
 
 
-class LeaderMissingError(Exception):
+class LeaderMissingError(ValueError):
     def __init__(self, message: str) -> None:
         self.message = message
 
@@ -19,7 +19,7 @@ class LeaderMissingError(Exception):
         return f"{self.message}"
 
 
-class LackExperienceError(Exception):
+class LackExperienceError(ValueError):
     def __init__(self, message: str) -> None:
         self.message = message
 
@@ -27,7 +27,7 @@ class LackExperienceError(Exception):
         return f"{self.message}"
 
 
-class ActiveMemebersError(Exception):
+class ActiveMemebersError(ValueError):
     def __init__(self, message: str) -> None:
         self.message = message
 
@@ -154,6 +154,6 @@ if __name__ == "__main__":
 
         for crew_member2 in crew_team2:
             print(f"- {crew_member2}")
-    except Exception as e:
+    except ValidationError as e:
         print("Expected validation error:")
         print(e)

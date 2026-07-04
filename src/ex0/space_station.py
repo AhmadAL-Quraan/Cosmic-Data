@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 
 # ... (Eclipse) means no default value, user must provide data for it
@@ -11,7 +11,7 @@ class station(BaseModel):
     crew_size: int = Field(..., ge=1, le=20)
     power_level: float = Field(..., ge=0.0, le=100.0)
     oxygen_level: float = Field(..., ge=0.0, le=100.0)
-    last_maintenance: datetime
+    last_maintenance: datetime = Field(...)
     is_operational: bool = Field(default=True)
     # Optioanl means: a
     # field can either be a string or None, short for Union[str,None]
@@ -57,5 +57,5 @@ if __name__ == "__main__":
             # datetime(year,month,day,hour, minute, second)
             last_maintenance=datetime(2026, 7, 2, 17, 30, 0),
         )
-    except Exception as e:
+    except ValidationError as e:
         print(f"\n{e}")

@@ -96,3 +96,11 @@ if __name__ == "__main__":
 ```
 
 
+> errors() method in `ValidationError` in exception class in Pydantic, can turn error messages into array of dict `list[dict]`, we can use this to print specific messages only like `err['msg']`
+
+Ex: 
+```python3
+   except ValidationError as e:
+        for err in e.errors():
+            print(err["msg"]) # -> print only error messages 
+```

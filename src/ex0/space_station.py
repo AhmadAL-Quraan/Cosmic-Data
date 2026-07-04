@@ -58,4 +58,5 @@ if __name__ == "__main__":
             last_maintenance=datetime(2026, 7, 2, 17, 30, 0),
         )
     except ValidationError as e:
-        print(f"\n{e}")
+        for err in e.errors():
+            print(err['msg'])

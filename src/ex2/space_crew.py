@@ -46,23 +46,23 @@ class Rank(Enum):
 class CrewMember(BaseModel):
     member_id: str = Field(..., min_length=3, max_length=10)
     name: str = Field(..., min_length=2, max_length=50)
-    rank: Rank
+    rank: Rank = Field(...)
     age: int = Field(..., ge=18, le=80)
     specialization: str = Field(..., min_length=3, max_length=30)
     years_experience: int = Field(..., ge=0, le=50)
-    is_active: bool = True
+    is_active: bool = Field(default=True)
 
 
 class SpaceMission(BaseModel):
     mission_id: str = Field(..., min_length=5, max_length=15)
     mission_name: str = Field(..., min_length=3, max_length=100)
     destination: str = Field(..., min_length=3, max_length=50)
-    launch_date: datetime
+    launch_date: datetime = Field(...)
     duration_days: int = Field(..., ge=1, le=3650)
     # min length and
     # max works on any type that has a length: str,list,set , tuple
     crew: list[CrewMember] = Field(..., min_length=1, max_length=12)
-    mission_status: str = "planned"
+    mission_status: str = Field(default="planned")
     budget_millions: float = Field(..., ge=1.0, le=10000.0)
 
     @model_validator(mode="after")
@@ -124,7 +124,7 @@ if __name__ == "__main__":
             rank=Rank.OFFICER,
             age=18,
             specialization="Engineering",
-            years_experience=6,
+            years_experience=2,
         )
         crew_team: list[CrewMember] = []
         crew_team.append(crew1)
@@ -156,4 +156,5 @@ if __name__ == "__main__":
             print(f"- {crew_member2}")
     except ValidationError as e:
         print("Expected validation error:")
-        print(e)
+        for error in e.errors():
+            print(error['msg'].removeprefix("Value error, "))

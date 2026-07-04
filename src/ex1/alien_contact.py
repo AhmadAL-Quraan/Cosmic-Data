@@ -116,10 +116,10 @@ if __name__ == "__main__":
             contact_id="AC-2026-01",
             timestamp=datetime(2026, 7, 3, 22, 15),
             location="Area 51, Nevada",
-            contact_type=ContactType.RADIO,
+            contact_type=ContactType.TELEPATHIC,
             signal_strength=8.9,
             duration_minutes=45,
-            witness_count=4,
+            witness_count=2,
             message_received="Greetings from Zeta Reticuli",
             is_verified=False,
         )
@@ -131,5 +131,7 @@ if __name__ == "__main__":
         print(f"Duration: {report.duration_minutes}")
         print(f"Message: {report.message_received}")
     except ValidationError as e:
-        print(f"Expected validation error:\n{e}")
+        print("Expected validation error:")
+        for error in e.errors():
+            print(error['msg'].removeprefix("Value error, "))
 # print(report.model_dump())
